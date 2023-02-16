@@ -92,6 +92,17 @@ class DetectLane():
 
         self.reliability_white_line = 100
         self.reliability_yellow_line = 100
+        
+        self.lightness_white_l_orig = self.lightness_white_l
+        self.lightness_yellow_l_orig = self.lightness_yellow_l
+        
+        self.lightness_bracket_delta_y = rospy.get_param("~detect/lane/yellow/bracket_delta", 60)
+        self.lightness_bracket_delta_w = rospy.get_param("~detect/lane/white/bracket_delta", 60)
+        
+        self.lightness_delta_y = rospy.get_param("~detect/lane/yellow/delta", 20)
+        self.lightness_delta_w = rospy.get_param("~detect/lane/white/delta", 5)
+        
+        self.frac_num_cutoff = rospy.get_param("~detect/lane/cutoff", 3000)
 
     def cbGetDetectLaneParam(self, config, level):
         rospy.loginfo("[Detect Lane] Detect Lane Calibration Parameter reconfigured to")
@@ -204,11 +215,13 @@ class DetectLane():
 
         if self.is_calibration_mode == False:
             if fraction_num > 35000:
-                if self.lightness_white_l < 250:
-                    self.lightness_white_l += 5
-            elif fraction_num < 5000:
-                if self.lightness_white_l > 50:
-                    self.lightness_white_l -= 5
+                if self.lightness_white_l < min(self.lightness_white_l_orig + self.lightness_bracket_delta_w, 250):
+                    self.lightness_white_l += self.lightness_bracket_delta_w
+            elif self.frac_num_cutoff < fraction_num < 5000:
+                if self.lightness_white_l > max(self.lightness_white_l_orig - self.lightness_bracket_delta_w, 50):
+                    self.lightness_white_l -= self.lightness_bracket_delta_w
+            else:
+                self.lightness_white_l = self.lightness_white_l_orig
 
         how_much_short = 0
 
@@ -265,11 +278,13 @@ class DetectLane():
 
         if self.is_calibration_mode == False:
             if fraction_num > 35000:
-                if self.lightness_yellow_l < 250:
-                    self.lightness_yellow_l += 20
-            elif fraction_num < 5000:
-                if self.lightness_yellow_l > 90:
-                    self.lightness_yellow_l -= 20
+                if self.lightness_yellow_l < min(self.lightness_yellow_l_orig + self.lightness_bracket_delta_y, 250):
+                    self.lightness_yellow_l += self.lightness_bracket_delta_y
+            elif self.frac_num_cutoff < fraction_num < 5000:
+                if self.lightness_yellow_l > max(self.lightness_yellow_l_orig - self.lightness_bracket_delta_y, 90):
+                    self.lightness_yellow_l -= self.lightness_bracket_delta_y
+            else:
+                self.lightness_yellow_l = self.lightness_yellow_l_orig
 
         how_much_short = 0
 
