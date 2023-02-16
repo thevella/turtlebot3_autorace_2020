@@ -1,8 +1,10 @@
 <launch>
   <!-- launch turtlebot3_autorace_detect_lane.launch before launch this file -->
-
+  <arg name="max_vel" default=0.25 />
+  
   <!-- lane control -->
   <node pkg="turtlebot3_autorace_driving" type="control_lane" name="control_lane" output="screen">
+    <param name="/control/max_vel" value="$(arg max_vel)" />
     <remap from="/control/lane" to="/detect/lane" />
     <remap from="/control/cmd_vel" to="/cmd_vel" />
   </node>
