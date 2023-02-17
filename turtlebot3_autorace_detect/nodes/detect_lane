@@ -103,6 +103,8 @@ class DetectLane():
         self.lightness_delta_w = rospy.get_param("~detect/lane/white/delta", 5)
         
         self.frac_num_cutoff = rospy.get_param("~detect/lane/cutoff", 3000)
+        
+        self.custom_run = rospy.get_param("~detect/lane/custom_cutoff", True)
 
     def cbGetDetectLaneParam(self, config, level):
         rospy.loginfo("[Detect Lane] Detect Lane Calibration Parameter reconfigured to")
@@ -214,14 +216,24 @@ class DetectLane():
         fraction_num = np.count_nonzero(mask)
 
         if self.is_calibration_mode == False:
-            if fraction_num > 35000:
-                if self.lightness_white_l < min(self.lightness_white_l_orig + self.lightness_bracket_delta_w, 250):
-                    self.lightness_white_l += self.lightness_bracket_delta_w
-            elif self.frac_num_cutoff < fraction_num < 5000:
-                if self.lightness_white_l > max(self.lightness_white_l_orig - self.lightness_bracket_delta_w, 50):
-                    self.lightness_white_l -= self.lightness_bracket_delta_w
+            if self.custom_run:
+                if fraction_num > 35000:
+                    if self.lightness_white_l < min(self.lightness_white_l_orig + self.lightness_bracket_delta_w, 250):
+                        self.lightness_white_l += self.lightness_bracket_delta_w
+                elif self.frac_num_cutoff < fraction_num < 5000:
+                    if self.lightness_white_l > max(self.lightness_white_l_orig - self.lightness_bracket_delta_w, 50):
+                        self.lightness_white_l -= self.lightness_bracket_delta_w
+                else:
+                    self.lightness_white_l = self.lightness_white_l_orig
+                    
             else:
-                self.lightness_white_l = self.lightness_white_l_orig
+                if fraction_num > 35000:
+                    if self.lightness_white_l < 250:
+                        self.lightness_white_l += 5
+                elif fraction_num < 5000:
+                    if self.lightness_white_l > 50:
+                        self.lightness_white_l -= 5
+                
 
         how_much_short = 0
 
@@ -277,14 +289,22 @@ class DetectLane():
         fraction_num = np.count_nonzero(mask)
 
         if self.is_calibration_mode == False:
-            if fraction_num > 35000:
-                if self.lightness_yellow_l < min(self.lightness_yellow_l_orig + self.lightness_bracket_delta_y, 250):
-                    self.lightness_yellow_l += self.lightness_bracket_delta_y
-            elif self.frac_num_cutoff < fraction_num < 5000:
-                if self.lightness_yellow_l > max(self.lightness_yellow_l_orig - self.lightness_bracket_delta_y, 90):
-                    self.lightness_yellow_l -= self.lightness_bracket_delta_y
+            if self.custom_run:
+                if fraction_num > 35000:
+                    if self.lightness_yellow_l < min(self.lightness_yellow_l_orig + self.lightness_bracket_delta_y, 250):
+                        self.lightness_yellow_l += self.lightness_bracket_delta_y
+                elif self.frac_num_cutoff < fraction_num < 5000:
+                    if self.lightness_yellow_l > max(self.lightness_yellow_l_orig - self.lightness_bracket_delta_y, 90):
+                        self.lightness_yellow_l -= self.lightness_bracket_delta_y
+                else:
+                    self.lightness_yellow_l = self.lightness_yellow_l_orig
             else:
-                self.lightness_yellow_l = self.lightness_yellow_l_orig
+                if fraction_num > 35000:
+                    if self.lightness_yellow_l < 250:
+                        self.lightness_yellow_l += 20
+                elif fraction_num < 5000:
+                    if self.lightness_yellow_l > 90:
+                        self.lightness_yellow_l -= 20
 
         how_much_short = 0
 

@@ -2,13 +2,15 @@
   <!-- launch extrinsic_camera_calibration.launch before launch this file -->
   <arg name="mode" default="action" doc="mode type [calibration, action]"/>
   
-  <arg name="b_delta_y" default=60/>
-  <arg name="delta_y" default=20/>
+  <arg name="b_delta_y" default="60"/>
+  <arg name="delta_y" default="20"/>
 
-  <arg name="b_delta_w" default=60/>
-  <arg name="delta_w" default=5/>
+  <arg name="b_delta_w" default="60"/>
+  <arg name="delta_w" default="5"/>
 
-  <arg name="cutoff" default=3000/>
+  <arg name="cutoff" default="3000"/>
+
+  <arg name="custom_cutoff" default="True"/>
 
   <!-- lane detection -->
   <node pkg="turtlebot3_autorace_detect" type="detect_lane" name="detect_lane" output="screen">
@@ -23,6 +25,8 @@
     <param name="/detect/lane/white/delta" value="$(arg delta_w)"/>
 
     <param name="/detect/lane/cutoff" value="$(arg cutoff)"/>
+
+    <param name="/detect/lane/custom_cutoff" value="$(arg custom_cutoff)"/>
 
     <remap from="/detect/image_input" to="/camera/image_projected_compensated" />
     <remap from="/detect/image_input/compressed" to="/camera/image_projected_compensated/compressed" />
