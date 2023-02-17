@@ -105,6 +105,10 @@ class DetectLane():
         self.frac_num_cutoff = rospy.get_param("~detect/lane/cutoff", 3000)
         
         self.custom_run = rospy.get_param("~detect/lane/custom_cutoff", True)
+        
+        self.publish_all = rospy.get_param("~detect/lane/publish_all_masks", False)
+        
+        self.short_threshold = rospy.get_param("~detect/lane/short_threshold", 600)
 
     def cbGetDetectLaneParam(self, config, level):
         rospy.loginfo("[Detect Lane] Detect Lane Calibration Parameter reconfigured to")
@@ -241,7 +245,7 @@ class DetectLane():
             if np.count_nonzero(mask[i,::]) > 0:
                 how_much_short += 1
 
-        how_much_short = 600 - how_much_short
+        how_much_short = self.short_threshold - how_much_short
 
         if how_much_short > 100:
             if self.reliability_white_line >= 5:
@@ -254,7 +258,7 @@ class DetectLane():
         msg_white_line_reliability.data = self.reliability_white_line
         self.pub_white_line_reliability.publish(msg_white_line_reliability)
 
-        if self.is_calibration_mode == True:
+        if self.is_calibration_mode == True or self.publish_all:
             if self.pub_image_type == "compressed":
                 # publishes white lane filtered image in compressed type
                 self.pub_image_white_lane.publish(self.cvBridge.cv2_to_compressed_imgmsg(mask, "jpg"))
@@ -312,7 +316,7 @@ class DetectLane():
             if np.count_nonzero(mask[i,::]) > 0:
                 how_much_short += 1
         
-        how_much_short = 600 - how_much_short
+        how_much_short = self.short_threshold - how_much_short
 
         if how_much_short > 100:
             if self.reliability_yellow_line >= 5:
@@ -325,7 +329,7 @@ class DetectLane():
         msg_yellow_line_reliability.data = self.reliability_yellow_line
         self.pub_yellow_line_reliability.publish(msg_yellow_line_reliability)
 
-        if self.is_calibration_mode == True:
+        if self.is_calibration_mode == True or self.publish_all:
             if self.pub_image_type == "compressed":
                 # publishes yellow lane filtered image in compressed type
                 self.pub_image_yellow_lane.publish(self.cvBridge.cv2_to_compressed_imgmsg(mask, "jpg"))
