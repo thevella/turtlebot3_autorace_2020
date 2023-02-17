@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "${workspaceFolder}/turtlebot3_autorace_2020"
+    "cmake.sourceDirectory": "${workspaceFolder}/turtlebot3_autorace_2020",
+    "cmake.configureOnOpen": false
 }
