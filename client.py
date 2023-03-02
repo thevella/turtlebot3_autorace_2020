@@ -1,6 +1,8 @@
 import socket
 import sys
 
+# https://docs.python.org/3/library/socketserver.html
+
 HOST, PORT = "localhost", 60123
 data = " ".join(sys.argv[1:])
 
