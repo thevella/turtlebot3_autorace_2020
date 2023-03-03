@@ -1,6 +1,8 @@
 import socketserver
 import sys
 import subprocess
+import pickle
+import data_structures as ds
 
 # https://docs.python.org/3/library/socketserver.html
 
@@ -11,10 +13,10 @@ class ros_handler(socketserver.StreamRequestHandler):
         # we can now use e.g. readline() instead of raw recv() calls
         self.data = self.rfile.readline().strip()
         print("{} wrote:".format(self.client_address[0]))
-        print(self.data)
+        print(pickle.loads(self.data))
         # Likewise, self.wfile is a file-like object used to write back
         # to the client
-        self.wfile.write(self.data.upper())
+        # self.wfile.write(self.data.upper())
 
 if __name__ == "__main__":
     HOST, PORT = "localhost", 60123
