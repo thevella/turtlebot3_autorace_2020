@@ -31,6 +31,8 @@ from turtlebot3_autorace_detect.cfg import DetectTrafficLightParamsConfig
 
 class DetectTrafficLight():
     def __init__(self):
+        self.pub_masks = True
+        
         self.hue_red_l = rospy.get_param("~detect/lane/red/hue_l", 0)
         self.hue_red_h = rospy.get_param("~detect/lane/red/hue_h", 26)
         self.saturation_red_l = rospy.get_param("~detect/lane/red/saturation_l", 239)
@@ -75,17 +77,14 @@ class DetectTrafficLight():
             # publishes compensated image in raw type
             self.pub_image_traffic_light = rospy.Publisher('/detect/image_output', Image, queue_size = 1)
 
-        if self.is_calibration_mode == True:
+        if self.is_calibration_mode == True or self.pub_masks:
             if self.pub_image_type == "compressed":
                 # publishes light image in compressed type 
                 self.pub_image_red_light = rospy.Publisher('/detect/image_output_sub1/compressed', CompressedImage, queue_size = 1)
-                # self.pub_image_yellow_light = rospy.Publisher('/detect/image_output_sub2/compressed', CompressedImage, queue_size = 1)
-                # self.pub_image_green_light = rospy.Publisher('/detect/image_output_sub3/compressed', CompressedImage, queue_size = 1)
+
             elif self.pub_image_type == "raw":
                 # publishes light image in raw type
                 self.pub_image_red_light = rospy.Publisher('/detect/image_output_sub1', Image, queue_size = 1)
-                # self.pub_image_yellow_light = rospy.Publisher('/detect/image_output_sub2', Image, queue_size = 1)
-                # self.pub_image_green_light = rospy.Publisher('/detect/image_output_sub3', Image, queue_size = 1)
 
 
         self.sub_traffic_light_finished = rospy.Subscriber('/control/traffic_light_finished', UInt8, self.cbTrafficLightFinished, queue_size = 1)
@@ -241,7 +240,7 @@ class DetectTrafficLight():
         # Bitwise-AND mask and original image
         res = cv2.bitwise_and(image, image, mask = mask)
 
-        if self.is_calibration_mode == True:
+        if self.is_calibration_mode == True or self.pub_masks:
             if self.pub_image_type == "compressed":
                 # publishes red light filtered image in compressed type
                 self.pub_image_red_light.publish(self.cvBridge.cv2_to_compressed_imgmsg(mask, "jpg"))
