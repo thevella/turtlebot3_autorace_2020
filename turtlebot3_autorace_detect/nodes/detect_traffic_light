@@ -184,6 +184,9 @@ class DetectTrafficLight():
         self.green_count = 0
         self.yellow_count = 0
 
+        self.green_count = 0
+        self.yellow_count = 0
+
         cv_image_mask = self.fnMaskRedTrafficLight()
         cv_image_mask = cv2.GaussianBlur(cv_image_mask,(5,5),0)
 
@@ -246,42 +249,6 @@ class DetectTrafficLight():
             elif self.pub_image_type == "raw":
                 # publishes red light filtered image in raw type
                 self.pub_image_red_light.publish(self.cvBridge.cv2_to_imgmsg(mask, "mono8"))
-
-        mask = cv2.bitwise_not(mask)
-
-        return mask
-
-    def fnMaskGreenTrafficLight(self):
-        image = np.copy(self.cv_image)
-
-        # Convert BGR to HSV
-        hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-
-        Hue_l = self.hue_green_l
-        Hue_h = self.hue_green_h
-        Saturation_l = self.saturation_green_l
-        Saturation_h = self.saturation_green_h
-        Lightness_l = self.lightness_green_l
-        Lightness_h = self.lightness_green_h
-
-        # define range of green color in HSV
-        lower_green = np.array([Hue_l, Saturation_l, Lightness_l])
-        upper_green = np.array([Hue_h, Saturation_h, Lightness_h])
-
-        # Threshold the HSV image to get only green colors
-        mask = cv2.inRange(hsv, lower_green, upper_green)
-
-        # Bitwise-AND mask and original image
-        # res = cv2.bitwise_and(image, image, mask = mask)
-
-        if self.is_calibration_mode == True:
-            if self.pub_image_type == "compressed":
-                # publishes green light filtered image in compressed type
-                self.pub_image_green_light.publish(self.cvBridge.cv2_to_compressed_imgmsg(mask, "jpg"))
-
-            elif self.pub_image_type == "raw":
-                # publishes green light filtered image in raw type
-                self.pub_image_green_light.publish(self.cvBridge.cv2_to_imgmsg(mask, "mono8"))
 
         mask = cv2.bitwise_not(mask)
 
