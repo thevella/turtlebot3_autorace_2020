@@ -116,9 +116,14 @@ class Command:
         
         self.command.kill()
         self.command = None
+        
+    def __str__(self) -> str:
+        r = {self.base_command: {"options": self.options, "state":self.check_state().name}}
+        
+        return str(r)
 
 
-server_command_map = {Commands.ROSCORE: Command("roscore"),
+client_command_map = {Commands.ROSCORE: Command("roscore"),
                Commands.CAMERA_INTRINSIC: Command("roslaunch turtlebot3_autorace_camera intrinsic_camera_calibration.launch").make_option("mode", "action"),
                Commands.CAMERA_EXTRINSIC: Command("roslaunch turtlebot3_autorace_camera extrinsic_camera_calibration.launch").make_option("mode", "action"),
                Commands.LANE_DETECT: Command("roslaunch turtlebot3_autorace_detect detect_lane.launch").make_option("mode", "action"),
