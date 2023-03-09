@@ -2,6 +2,11 @@ import socket
 import sys
 import pickle
 import data_structures as ds
+from data_structures import Commands, Command
+
+# command_map = {Commands.CAMERA_PUBLISH: Command("roslaunch turtlebot3_autorace_camera raspberry_pi_camera_publish.launch").make_option("rate", 20),
+#                Commands.PI_BRINGUP: Command("roslaunch turtlebot3_bringup turtlebot3_robot.launch")
+#                }
 
 # https://docs.python.org/3/library/socketserver.html
 

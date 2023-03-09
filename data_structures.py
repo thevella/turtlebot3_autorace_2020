@@ -7,6 +7,7 @@ class Commands(enum.IntFlag):
     CAMERA_INTRINSIC = enum.auto()
     CAMERA_EXTRINSIC = enum.auto()
     LANE_DETECT = enum.auto()
+    TRAFFIC_DETECT = enum.auto()
     DRIVING = enum.auto()
     CAMERA_PUBLISH = enum.auto()
     PI_BRINGUP = enum.auto()
@@ -21,14 +22,20 @@ class Command_State(enum.IntEnum):
     RUNNING = enum.auto()
     STOPPED = enum.auto()
     FAILED = enum.auto()
+    
+class Host(enum.Enum):
+    TURTLEBOT = "172.26.181.111",
+    ROS = "172.26.108.68"
 
 class Command:
     base_command :str = ""
     options :dict = {}
     command : subprocess.Popen = None
+    host : Host = None
     
-    def __init__(self, base_command = "", options = {}):
-
+    def __init__(self, host, base_command = "", options = {}):
+        self.host = host
+        
         self.options = options
             
         self.base_command = base_command
@@ -123,17 +130,16 @@ class Command:
         return str(r)
 
 
-client_command_map = {Commands.ROSCORE: Command("roscore"),
-               Commands.CAMERA_INTRINSIC: Command("roslaunch turtlebot3_autorace_camera intrinsic_camera_calibration.launch").make_option("mode", "action"),
-               Commands.CAMERA_EXTRINSIC: Command("roslaunch turtlebot3_autorace_camera extrinsic_camera_calibration.launch").make_option("mode", "action"),
-               Commands.LANE_DETECT: Command("roslaunch turtlebot3_autorace_detect detect_lane.launch").make_option("mode", "action"),
-               Commands.DRIVING: Command("roslaunch turtlebot3_autorace_driving turtlebot3_autorace_control_lane.launch")\
-                                    .make_option("b_delta_y", 300).make_option("b_delta_w", 300).make_option("cutoff", -1)\
-                                    .make_option("delta_w", 5).make_option("delta_y", 20).make_option("custom_cutoff", False)\
-                                    .make_option("short_thresh", 550),
-               Commands.CAMERA_PUBLISH: Command("roslaunch turtlebot3_autorace_camera raspberry_pi_camera_publish.launch").make_option("rate", 20),
-               Commands.PI_BRINGUP: Command("roslaunch turtlebot3_bringup turtlebot3_robot.launch")
-               }
+command_name_map = {Commands.ROSCORE: "Roscore",
+                    Commands.CAMERA_INTRINSIC: "Intrinsic Calibration",
+                    Commands.CAMERA_EXTRINSIC: "Extrinsic Calibration",
+                    Commands.LANE_DETECT: "Lane Detection",
+                    Commands.TRAFFIC_DETECT: "Traffic Detection",
+                    Commands.DRIVING: "Driving Control",
+                    Commands.CAMERA_PUBLISH: "Publish Camera",
+                    Commands.PI_BRINGUP: "Bringup Controls"
+                    
+                    }
 
 
 
