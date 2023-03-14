@@ -1,0 +1,47 @@
+import rospy
+import numpy as np
+import cv2
+from sensor_msgs.msg import Image, CompressedImage
+from cv_bridge import CvBridge
+from dynamic_reconfigure.server import Server
+from turtlebot3_autorace_camera.cfg import ImageProjectionParamsConfig
+
+class ImageCapture():
+    def __init__(self):
+        self.img_width = rospy.get_param("~camera/img_width", 320)
+        self.img_height = rospy.get_param("~camera/img_height", 240)
+        self.rate = rospy.get_param("~camera/rate", 30)
+        self.frame_id = rospy.get_param("~camera/frame_id", "camera")
+
+        # publishes compensated image in raw type
+        self.pub_image = rospy.Publisher('/cv_camera/image_raw', Image, queue_size = 1)
+
+        self.cvBridge = CvBridge()
+        
+        self.camera = cv2.VideoCapture(0)
+        self.camera.set(cv2.CAP_PROP_FRAME_WIDTH, self.img_width)
+        self.camera.set(cv2.CAP_PROP_FRAME_HEIGHT, self.img_height)
+        
+        rospy.on_shutdown(self.fnShutDown)
+        
+        loop_rate = rospy.Rate(self.rate)
+        while not rospy.is_shutdown():
+            self.fnTakeImage()
+
+            loop_rate.sleep()
+
+
+    def fnTakeImage(self):
+        ret, frame = self.camera.read()
+        self.pub_image(self.cvBridge.cv2_to_imgmsg(frame, "bgr8"))
+
+    def fnShutDown(self):
+        self.camera.release()
+
+    def main(self):
+        rospy.spin()
+
+if __name__ == '__main__':
+    rospy.init_node('image_capture_py')
+    node = ImageCapture()
+    node.main()
