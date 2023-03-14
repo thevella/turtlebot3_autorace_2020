@@ -45,6 +45,7 @@ catkin_package(
 catkin_install_python(PROGRAMS
   nodes/image_compensation
   nodes/image_projection
+  nodes/rasppi_camera
  	DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

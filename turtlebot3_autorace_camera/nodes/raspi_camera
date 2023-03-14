@@ -3,8 +3,6 @@ import numpy as np
 import cv2
 from sensor_msgs.msg import Image, CompressedImage
 from cv_bridge import CvBridge
-from dynamic_reconfigure.server import Server
-from turtlebot3_autorace_camera.cfg import ImageProjectionParamsConfig
 
 class ImageCapture():
     def __init__(self):
@@ -21,6 +19,7 @@ class ImageCapture():
         self.camera = cv2.VideoCapture(0)
         self.camera.set(cv2.CAP_PROP_FRAME_WIDTH, self.img_width)
         self.camera.set(cv2.CAP_PROP_FRAME_HEIGHT, self.img_height)
+        self.camera.set(cv2.CAP_PROP_BUFFERSIZE, 1)
         
         rospy.on_shutdown(self.fnShutDown)
         

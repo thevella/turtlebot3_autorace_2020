@@ -1,5 +1,5 @@
 <launch>
-  <node pkg="turtlebot3_autorace_camera" type="cv_camera_node" name="rasppi_camera" output="screen">
+  <node pkg="turtlebot3_autorace_camera" type="rasppi_camera" name="rasppi_camera" output="screen">
     <param name="camera_info_url" value="package://turtlebot3_autorace_camera/calibration/intrinsic_calibration/camerav2_320x240_30fps.yaml"/>
     <param name="/camera/image_width" value="320"/>
     <param name="/camera/image_height" value="240"/>
